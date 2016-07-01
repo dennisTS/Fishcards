@@ -4,54 +4,35 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.PixelFormat;
-import android.graphics.Point;
-import android.hardware.display.DisplayManager;
-import android.hardware.display.VirtualDisplay;
-import android.media.Image;
-import android.media.ImageReader;
-import android.media.projection.MediaProjection;
-import android.media.projection.MediaProjectionManager;
-import android.net.Uri;
-import android.os.Environment;
-import android.os.Handler;
 import android.os.Bundle;
-import android.os.HandlerThread;
-import android.os.Process;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.NotificationCompat;
-import android.util.Log;
-import android.view.Display;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
-
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.util.List;
 
 
 public class MainActivity extends AppCompatActivity  {
 
     private static final int NOTIFY_ID = 1337;
 
-    private TextView testLabel;
+    private Button startRunningButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        testLabel = (TextView) findViewById(R.id.test_label);
-
-        raisePermanentNotification();
+        startRunningButton = (Button) findViewById(R.id.start_running_button);
+        startRunningButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                raisePermanentNotification();
+                finish();
+            }
+        });
     }
 
 
