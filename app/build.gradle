@@ -2,10 +2,10 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 22
-    buildToolsVersion "23.0.0 rc2"
+    buildToolsVersion "24.0.0"
 
     defaultConfig {
-        applicationId "com.example.test.myapplicationtesticon"
+        applicationId "com.fersifex.fishcards"
         minSdkVersion 21
         targetSdkVersion 22
         versionCode 1

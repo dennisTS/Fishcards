@@ -1,4 +1,4 @@
-package com.example.test.myapplicationtesticon;
+package com.fersifex.fishcards;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;

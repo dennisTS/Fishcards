@@ -1,4 +1,4 @@
-package com.example.test.myapplicationtesticon;
+package com.fersifex.fishcards;
 
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -11,8 +11,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.TextView;
-
 
 public class MainActivity extends AppCompatActivity  {
 
