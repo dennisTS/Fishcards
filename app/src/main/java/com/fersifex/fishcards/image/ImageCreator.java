@@ -12,7 +12,7 @@ import android.view.Surface;
 import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
 
-public class ImageProcessor implements ImageReader.OnImageAvailableListener {
+public class ImageCreator implements ImageReader.OnImageAvailableListener {
 
     private MediaProjection projection;
     private ImageReader reader;
@@ -21,8 +21,9 @@ public class ImageProcessor implements ImageReader.OnImageAvailableListener {
     private int height;
 
     private byte[] image;
+    private Bitmap.Config bitDepth;
 
-    public ImageProcessor(MediaProjection projection, Point size, Handler handler) {
+    public ImageCreator(MediaProjection projection, Point size, Handler handler) {
         this.projection = projection;
 
         this.width = size.x;
@@ -30,6 +31,8 @@ public class ImageProcessor implements ImageReader.OnImageAvailableListener {
 
         this.reader = ImageReader.newInstance(size.x, size.y, PixelFormat.RGBA_8888, 1);
         this.reader.setOnImageAvailableListener(this, handler);
+
+        this.bitDepth = Bitmap.Config.ARGB_8888;
     }
 
     @Override
@@ -46,7 +49,7 @@ public class ImageProcessor implements ImageReader.OnImageAvailableListener {
             int bitmapWidth = width + rowPadding / pixelStride;
 
             Bitmap bitmap = Bitmap.createBitmap(bitmapWidth,
-                    height, Bitmap.Config.ARGB_8888);
+                    height, bitDepth);
 
             bitmap.copyPixelsFromBuffer(buffer);
 
@@ -83,5 +86,13 @@ public class ImageProcessor implements ImageReader.OnImageAvailableListener {
 
     public Surface getSurface() {
         return reader.getSurface();
+    }
+
+    public int getBytesPerPixel() {
+        if (bitDepth == Bitmap.Config.ARGB_8888) {
+            return 4;
+        } else {
+            throw new IllegalStateException("Bit depth not properly set up");
+        }
     }
 }

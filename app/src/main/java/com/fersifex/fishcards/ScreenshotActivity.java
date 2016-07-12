@@ -15,7 +15,8 @@ import android.util.Log;
 import android.view.Display;
 import android.widget.Toast;
 
-import com.fersifex.fishcards.image.ImageProcessor;
+import com.fersifex.fishcards.image.ImageCreator;
+import com.googlecode.tesseract.android.TessBaseAPI;
 
 public class ScreenshotActivity extends Activity {
 
@@ -63,21 +64,44 @@ public class ScreenshotActivity extends Activity {
     }
 
     private void makeScreenshot(MediaProjection projection) {
-        final ImageProcessor processor = new ImageProcessor(projection, getScreenSize(), handler);
+        final ImageCreator imageCreator = new ImageCreator(projection, getScreenSize(), handler);
 
-        final VirtualDisplay virtualDisplay = projection.createVirtualDisplay(VD_NAME, processor.getWidth(), processor.getHeight(),
-                getResources().getDisplayMetrics().densityDpi, VD_FLAGS, processor.getSurface(),
+        final VirtualDisplay virtualDisplay = projection.createVirtualDisplay(VD_NAME, imageCreator.getWidth(), imageCreator.getHeight(),
+                getResources().getDisplayMetrics().densityDpi, VD_FLAGS, imageCreator.getSurface(),
                 null, handler);
 
         MediaProjection.Callback callback = new MediaProjection.Callback() {
             @Override
             public void onStop() {
-                byte[] image = processor.getImage();
                 virtualDisplay.release();
+
+                sendImage(imageCreator);
             }
         };
 
         projection.registerCallback(callback, handler);
+    }
+
+    private void sendImage(ImageCreator imageCreator) {
+        byte[] image = imageCreator.getImage();
+
+        TessBaseAPI baseAPI = new TessBaseAPI();
+
+        int bytesPerPixel = imageCreator.getBytesPerPixel();
+        int bytesPerLine = bytesPerPixel * imageCreator.getWidth();
+
+        baseAPI.setImage(image,
+                imageCreator.getWidth(), imageCreator.getHeight(),
+                bytesPerPixel, bytesPerLine);
+
+        String text = baseAPI.getUTF8Text();
+
+        baseAPI.end();
+
+        Intent intent = new Intent(ScreenshotActivity.this, MainActivity.class);
+        intent.putExtra(MainActivity.TEXT_EXTRA, text);
+
+        startActivity(intent);
     }
 
     private Point getScreenSize() {

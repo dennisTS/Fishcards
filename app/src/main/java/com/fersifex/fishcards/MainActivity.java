@@ -11,12 +11,15 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
 
     private static final int NOTIFY_ID = 1337;
+    public static final String TEXT_EXTRA = "text_extra";
 
     private Button startRunningButton;
+    private TextView textView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,6 +34,12 @@ public class MainActivity extends AppCompatActivity {
                 finish();
             }
         });
+
+        String text = getIntent().getStringExtra(TEXT_EXTRA);
+        if (text != null) {
+            textView = (TextView) findViewById(R.id.text_view);
+            textView.setText(text);
+        }
     }
 
 
