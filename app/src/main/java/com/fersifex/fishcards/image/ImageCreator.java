@@ -22,6 +22,7 @@ public class ImageCreator implements ImageReader.OnImageAvailableListener {
 
     private byte[] image;
     private Bitmap.Config bitDepth;
+    private MediaProjection.Callback callback;
 
     public ImageCreator(MediaProjection projection, Point size, Handler handler) {
         this.projection = projection;
@@ -67,6 +68,10 @@ public class ImageCreator implements ImageReader.OnImageAvailableListener {
 
             //TODO end of heavy processing.
             //TODO handler.dispatchMessage with image
+
+            if (callback != null) {
+                callback.onStop();
+            }
             projection.stop();
             reader.close();
         }
@@ -94,5 +99,9 @@ public class ImageCreator implements ImageReader.OnImageAvailableListener {
         } else {
             throw new IllegalStateException("Bit depth not properly set up");
         }
+    }
+
+    public void setOnStopListener(MediaProjection.Callback callback) {
+        this.callback = callback;
     }
 }

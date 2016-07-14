@@ -79,7 +79,8 @@ public class ScreenshotActivity extends Activity {
             }
         };
 
-        projection.registerCallback(callback, handler);
+        imageCreator.setOnStopListener(callback);
+        //projection.registerCallback(callback, handler);
     }
 
     private void sendImage(ImageCreator imageCreator) {
