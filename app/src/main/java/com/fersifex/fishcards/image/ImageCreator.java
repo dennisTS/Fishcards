@@ -9,31 +9,33 @@ import android.media.projection.MediaProjection;
 import android.os.Handler;
 import android.view.Surface;
 
-import java.io.ByteArrayOutputStream;
+import com.googlecode.leptonica.android.Pix;
+import com.googlecode.leptonica.android.ReadFile;
+
 import java.nio.ByteBuffer;
 
 public class ImageCreator implements ImageReader.OnImageAvailableListener {
 
+    public static final int PIXEL_LIMIT = 650000;
+    public static final int DENOMINATOR = 2;
+    private static final Bitmap.Config BIT_DEPTH = Bitmap.Config.ARGB_8888;
+
     private MediaProjection projection;
+    private MediaProjection.Callback callback;
+
     private ImageReader reader;
 
     private int width;
     private int height;
-
-    private byte[] image;
-    private Bitmap.Config bitDepth;
-    private MediaProjection.Callback callback;
+    private Pix image;
 
     public ImageCreator(MediaProjection projection, Point size, Handler handler) {
+        setSize(size);
+
         this.projection = projection;
 
-        this.width = size.x;
-        this.height = size.y;
-
-        this.reader = ImageReader.newInstance(size.x, size.y, PixelFormat.RGBA_8888, 1);
+        this.reader = ImageReader.newInstance(this.width, this.height, PixelFormat.RGBA_8888, 1);
         this.reader.setOnImageAvailableListener(this, handler);
-
-        this.bitDepth = Bitmap.Config.ARGB_8888;
     }
 
     @Override
@@ -50,7 +52,7 @@ public class ImageCreator implements ImageReader.OnImageAvailableListener {
             int bitmapWidth = width + rowPadding / pixelStride;
 
             Bitmap bitmap = Bitmap.createBitmap(bitmapWidth,
-                    height, bitDepth);
+                    height, BIT_DEPTH);
 
             bitmap.copyPixelsFromBuffer(buffer);
 
@@ -58,13 +60,11 @@ public class ImageCreator implements ImageReader.OnImageAvailableListener {
                 image.close();
             }
 
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
             Bitmap cropped = Bitmap.createBitmap(bitmap, 0, 0,
                     width, height);
 
-            cropped.compress(Bitmap.CompressFormat.PNG, 100, baos);
-
-            this.image = baos.toByteArray();
+            this.image = ReadFile.readBitmap(cropped);
+            cropped.recycle();
 
             //TODO end of heavy processing.
             //TODO handler.dispatchMessage with image
@@ -77,7 +77,17 @@ public class ImageCreator implements ImageReader.OnImageAvailableListener {
         }
     }
 
-    public byte[] getImage() {
+    private void setSize(Point size) {
+        this.width = size.x;
+        this.height = size.y;
+
+        while(this.width * this.height > PIXEL_LIMIT) {
+            this.width = this.width / DENOMINATOR;
+            this.height = this.height / DENOMINATOR;
+        }
+    }
+
+    public Pix getImage() {
         return image;
     }
 
@@ -91,14 +101,6 @@ public class ImageCreator implements ImageReader.OnImageAvailableListener {
 
     public Surface getSurface() {
         return reader.getSurface();
-    }
-
-    public int getBytesPerPixel() {
-        if (bitDepth == Bitmap.Config.ARGB_8888) {
-            return 4;
-        } else {
-            throw new IllegalStateException("Bit depth not properly set up");
-        }
     }
 
     public void setOnStopListener(MediaProjection.Callback callback) {

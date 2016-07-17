@@ -7,6 +7,7 @@ import android.hardware.display.DisplayManager;
 import android.hardware.display.VirtualDisplay;
 import android.media.projection.MediaProjection;
 import android.media.projection.MediaProjectionManager;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Process;
@@ -84,16 +85,12 @@ public class ScreenshotActivity extends Activity {
     }
 
     private void sendImage(ImageCreator imageCreator) {
-        byte[] image = imageCreator.getImage();
-
         TessBaseAPI baseAPI = new TessBaseAPI();
 
-        int bytesPerPixel = imageCreator.getBytesPerPixel();
-        int bytesPerLine = bytesPerPixel * imageCreator.getWidth();
-
-        baseAPI.setImage(image,
-                imageCreator.getWidth(), imageCreator.getHeight(),
-                bytesPerPixel, bytesPerLine);
+        baseAPI.setDebug(true);
+        baseAPI.init(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath() + "/", "eng");
+        baseAPI.setPageSegMode(TessBaseAPI.PageSegMode.PSM_SPARSE_TEXT_OSD);
+        baseAPI.setImage(imageCreator.getImage());
 
         String text = baseAPI.getUTF8Text();
 
