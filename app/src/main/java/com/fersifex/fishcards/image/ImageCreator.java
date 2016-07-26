@@ -40,34 +40,14 @@ public class ImageCreator implements ImageReader.OnImageAvailableListener {
 
     @Override
     public void onImageAvailable(ImageReader reader) {
-// TODO Start spinner. Long processing (2s)
         Image image=reader.acquireLatestImage();
 
         if (image!=null) {
-            Image.Plane[] planes = image.getPlanes();
-            ByteBuffer buffer = planes[0].getBuffer();
-            int pixelStride = planes[0].getPixelStride();
-            int rowStride = planes[0].getRowStride();
-            int rowPadding = rowStride - pixelStride * width;
-            int bitmapWidth = width + rowPadding / pixelStride;
-
-            Bitmap bitmap = Bitmap.createBitmap(bitmapWidth,
-                    height, BIT_DEPTH);
-
-            bitmap.copyPixelsFromBuffer(buffer);
-
-            if (image != null) {
-                image.close();
-            }
-
-            Bitmap cropped = Bitmap.createBitmap(bitmap, 0, 0,
+            Bitmap cropped = Bitmap.createBitmap(getScaledBitmap(image), 0, 0,
                     width, height);
 
             this.image = ReadFile.readBitmap(cropped);
             cropped.recycle();
-
-            //TODO end of heavy processing.
-            //TODO handler.dispatchMessage with image
 
             if (callback != null) {
                 callback.onStop();
@@ -75,6 +55,22 @@ public class ImageCreator implements ImageReader.OnImageAvailableListener {
             projection.stop();
             reader.close();
         }
+    }
+
+    private Bitmap getScaledBitmap(Image image) {
+        Image.Plane[] planes = image.getPlanes();
+        ByteBuffer buffer = planes[0].getBuffer();
+        int pixelStride = planes[0].getPixelStride();
+        int rowStride = planes[0].getRowStride();
+        int rowPadding = rowStride - pixelStride * width;
+        int bitmapWidth = width + rowPadding / pixelStride;
+
+        Bitmap bitmap = Bitmap.createBitmap(bitmapWidth,
+                height, BIT_DEPTH);
+
+        bitmap.copyPixelsFromBuffer(buffer);
+        image.close();
+        return bitmap;
     }
 
     private void setSize(Point size) {

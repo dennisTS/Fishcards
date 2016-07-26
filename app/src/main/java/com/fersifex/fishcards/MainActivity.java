@@ -1,11 +1,11 @@
 package com.fersifex.fishcards;
 
+import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.NotificationCompat;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -13,7 +13,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends Activity {
 
     private static final int NOTIFY_ID = 1337;
     public static final String TEXT_EXTRA = "text_extra";
@@ -41,7 +41,6 @@ public class MainActivity extends AppCompatActivity {
             textView.setText(text);
         }
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

@@ -81,7 +81,6 @@ public class ScreenshotActivity extends Activity {
         };
 
         imageCreator.setOnStopListener(callback);
-        //projection.registerCallback(callback, handler);
     }
 
     private void sendImage(ImageCreator imageCreator) {
@@ -92,13 +91,14 @@ public class ScreenshotActivity extends Activity {
         baseAPI.setPageSegMode(TessBaseAPI.PageSegMode.PSM_SPARSE_TEXT_OSD);
         baseAPI.setImage(imageCreator.getImage());
 
+        imageCreator.getImage().recycle();
+
         String text = baseAPI.getUTF8Text();
 
         baseAPI.end();
 
         Intent intent = new Intent(ScreenshotActivity.this, MainActivity.class);
         intent.putExtra(MainActivity.TEXT_EXTRA, text);
-
         startActivity(intent);
     }
 
